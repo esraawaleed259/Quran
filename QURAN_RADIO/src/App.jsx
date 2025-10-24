@@ -12,7 +12,6 @@ const reciters = [
 	{ id: 1, name_ar: 'مشاري بن راشد العفاسي', name_en: 'Mishary Alafasy', code: 'ar.alafasy' }, 
 	{ id: 2, name_ar: 'عبد الباسط عبد الصمد', name_en: 'Abdul Basit (Murattal)', code: 'ar.abdulbasitmurattal' }, 
 	{ id: 3, name_ar: 'ماهر بن حمد المعيقلي', name_en: 'Maher Al Muaiqly', code: 'ar.mahermuaiqly' }, 
-    // FIX: تم حذف الشريم والسديس بسبب عدم توفر تلاواتهم للآيات المنفردة بشكل موثوق في الـ API
     // ADD: إضافة مقرئ موثوق آخر
     { id: 4, name_ar: 'أحمد بن علي العجمي', name_en: 'Ahmad Al-Ajmi', code: 'ar.ahmedajamy' },
     { id: 5, name_ar: 'محمد صديق المنشاوي', name_en: 'Muhammad Siddeeq al-Minshawi', code: 'ar.minshawi' }, 
@@ -67,7 +66,7 @@ const translations = {
 		title: 'صدى الآيات',
 		reciters_title: 'اختر المقرئ',
 		search_placeholder: 'ابحث باسم المقرئ...',
-		loading: '...جاري تحميل المقرئين والسور',
+		loading: '...جاري تحميل السور',
 		error: 'عذراً، حدث خطأ أثناء الاتصال.',
 		not_playing: 'لم يتم بدء التشغيل بعد',
 		playing: 'الآن: سورة ${surahName} للمقرئ ${reciterName}',
@@ -92,7 +91,7 @@ const translations = {
 		title: 'Sada Al-Ayat',
 		reciters_title: 'Select Reciter',
 		search_placeholder: 'Search for Reciter...',
-		loading: 'Loading Reciters and Surahs...',
+		loading: 'Loading Surahs...',
 		error: 'Sorry, an error occurred.',
 		not_playing: 'Not playing yet',
 		playing: 'Now Playing: Surah ${surahName} by ${reciterName}',
@@ -117,7 +116,7 @@ const translations = {
 		title: 'Sada Al-Ayat',
 		reciters_title: 'Sélectionner Récitateur',
 		search_placeholder: 'Rechercher un Récitateur...',
-		loading: 'Chargement des Récitateurs et des Sourates...',
+		loading: 'Chargement des Sourates...',
 		error: 'Désolé, une erreur est survenue.',
 		not_playing: 'Pas encore de lecture',
 		playing: 'En cours : Sourate ${surahName} par ${reciterName}',
@@ -142,7 +141,7 @@ const translations = {
 		title: 'Sada Al-Ayat',
 		reciters_title: 'Wähle den Rezitator',
 		search_placeholder: 'Suche nach Rezitator...',
-		loading: 'Rezitatoren und Suren werden geladen...',
+		loading: 'Suren werden geladen...',
 		error: 'Entschuldigung, ein Fehler ist aufgetreten.',
 		not_playing: 'Noch nicht am Spielen',
 		playing: 'Aktuell: Sure ${surahName} von ${reciterName}',
@@ -191,6 +190,18 @@ const BackgroundPattern = ({ currentTheme }) => (
 		</defs>
 		<rect width="100%" height="100%" fill="url(#islamicPattern)" />
 	</svg>
+);
+
+// 🌙 مكون الشعار (لوجو) - تم حذفه لعدم إمكانية استخدام صور خارجية.
+// سنعتمد على النص "صدى الآيات" مع مؤثرات ذهبية قوية كشعار بصري.
+
+// مكون الشعار النصي الفاخر
+const TextLogo = ({ currentTheme, getTranslation }) => (
+    <div className="flex items-center space-x-4 space-x-reverse echo-effect-logo">
+        <h1 className="text-3xl font-extrabold font-['Amiri']" style={{ color: currentTheme.accent }}>
+            {getTranslation('title')}
+        </h1>
+    </div>
 );
 
 
@@ -645,9 +656,8 @@ export default function App() {
 		>
 			{/* الشعار */}
 			<div className="flex items-center space-x-4 space-x-reverse">
-				<h1 className="text-2xl font-bold font-['Amiri']" style={{ color: currentTheme.accent }}>
-					{getTranslation('title')}
-				</h1>
+                {/* تم استبدال الشعار الأيقوني بـ الشعار النصي الفاخر */}
+                <TextLogo currentTheme={currentTheme} getTranslation={getTranslation} />
 			</div>
 
 			{/* حقل البحث */}
@@ -899,6 +909,13 @@ export default function App() {
 					</div>
 
 					<ul className="space-y-2 overflow-y-auto flex-grow pr-2">
+                        {/* عرض رسالة إذا لم يتم تحميل السور بعد وفتح القائمة */}
+                        {loading && surahs.length === 0 && (
+                            <li className="text-center p-4 text-sm" style={{ color: currentTheme.text }}>
+								{getTranslation('loading')}
+							</li>
+                        )}
+                        
 						{filteredSurahs.map((surah) => (
 							<li
 								key={surah.number}
@@ -915,7 +932,7 @@ export default function App() {
 								</span>
 							</li>
 						))}
-						{filteredSurahs.length === 0 && (
+						{filteredSurahs.length === 0 && !loading && (
 							<li className="text-center p-4 text-sm" style={{ color: currentTheme.text }}>
 								لا توجد نتائج بحث مطابقة.
 							</li>
@@ -1048,35 +1065,43 @@ export default function App() {
 					{getTranslation('reciters_title')}
 				</h2>
 
-				{loading ? (
-					<p className="text-center text-xl mt-10" style={{ color: currentTheme.text }}>{getTranslation('loading')}</p>
-				) : (
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-						{filteredReciters.map(reciter => (
-							<ReciterCard key={reciter.id} reciter={reciter} selectReciter={selectReciter} />
-						))}
-						{filteredReciters.length === 0 && (
-							<p className="col-span-full text-center text-xl mt-10" style={{ color: currentTheme.text }}>
-								{getTranslation('search_placeholder').replace('ابحث', 'لا توجد نتائج بحث مطابقة لـ')} "{searchTerm}"
-							</p>
-						)}
-					</div>
-				)}
-				{/* رسالة خطأ التحميل الأولي */}
-				{initialError && (
-					<div className="text-center p-6 mt-10 rounded-xl bg-red-800/20 text-yellow-500 shadow-2xl" style={{ borderColor: currentTheme.accent, border: '2px solid' }}>
-						<AlertTriangle size={32} className="mx-auto mb-3" style={{ color: currentTheme.accent }}/>
-						<h2 className="text-2xl font-bold mb-2">
-							{getTranslation('error')}
-						</h2>
-						<p className="text-lg">
-							{getTranslation('network_error')}
+				{/* FIX: يتم الآن عرض بطاقات المقرئين حتى لو لم يتم تحميل قائمة السور، 
+                    وهذا يحل مشكلة الشاشة الفارغة ويسمح للمستخدم بالاختيار */}
+				<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+					{filteredReciters.map(reciter => (
+						<ReciterCard key={reciter.id} reciter={reciter} selectReciter={selectReciter} />
+					))}
+					{filteredReciters.length === 0 && (
+						<p className="col-span-full text-center text-xl mt-10" style={{ color: currentTheme.text }}>
+							{getTranslation('search_placeholder').replace('ابحث', 'لا توجد نتائج بحث مطابقة لـ')} "{searchTerm}"
 						</p>
-						<p className="text-sm opacity-70 mt-2">
-							الرجاء التأكد من اتصالك بالإنترنت.
-						</p>
-					</div>
-				)}
+					)}
+				</div>
+                
+                {/* رسالة التحميل أو الخطأ */}
+                {(loading || initialError) && (
+                    <div className="text-center mt-10 p-4 col-span-full">
+                        {loading && (
+                            <p className="text-center text-xl" style={{ color: currentTheme.text }}>
+                                {getTranslation('loading')}
+                            </p>
+                        )}
+                        {initialError && (
+                             <div className="text-center p-6 rounded-xl bg-red-800/20 text-yellow-500 shadow-2xl" style={{ borderColor: currentTheme.accent, border: '2px solid' }}>
+                                <AlertTriangle size={32} className="mx-auto mb-3" style={{ color: currentTheme.accent }}/>
+                                <h2 className="text-2xl font-bold mb-2">
+                                    {getTranslation('error')}
+                                </h2>
+                                <p className="text-lg">
+                                    {getTranslation('network_error')}
+                                </p>
+                                <p className="text-sm opacity-70 mt-2">
+                                    لا يمكن عرض قائمة السور الآن. يمكنك اختيار المقرئ والمحاولة لاحقاً.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
 			</main>
 
 			{/* Player Bar */}
