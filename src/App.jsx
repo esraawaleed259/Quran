@@ -1,3 +1,4 @@
+import './style.css'
 import * as React from 'react';
 const { useState, useEffect, useCallback, useRef } = React;
 import { Search, Moon, Sun, Globe, Play, Pause, Volume2, VolumeX, List, Star, Mic, RotateCw, AlertTriangle } from 'lucide-react'; 
