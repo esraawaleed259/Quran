@@ -41,15 +41,16 @@ const themes = {
         icon: 'text-[#AA8453]',
         darkToggle: true,
     },
+    // تم تعديل الثيم الفاتح ليكون أكثر وضوحاً وسهولة
     light: {
-        bgStart: '#F9FAFB',
-        bgEnd: '#FFFFFF',
-        text: '#1F2937',
-        accent: '#D97706',
-        card: 'rgba(255, 255, 255, 0.95)',
-        cardHover: '#E5E7EB',
-        shadow: 'rgba(217, 119, 6, 0.4)',
-        icon: 'text-amber-700',
+        bgStart: '#F5F7F8', // رمادي فاتح جداً
+        bgEnd: '#FFFFFF', // أبيض
+        text: '#1F2937', // لون نص غامق
+        accent: '#2563EB', // أزرق هادئ بدلاً من البرتقالي
+        card: 'rgba(255, 255, 255, 0.95)', // خلفية البطاقات
+        cardHover: '#E0E7FF', // خلفية عند المرور (أزرق فاتح جداً)
+        shadow: 'rgba(37, 99, 235, 0.4)', // ظل أزرق
+        icon: 'text-[#2563EB]',
         darkToggle: false,
     }
 };
@@ -196,7 +197,8 @@ export default function App() {
     const [searchTerm, setSearchTerm] = useState('');
     const [listSearchTerm, setListSearchTerm] = useState('');
     const [currentLang, setCurrentLang] = useState(localStorage.getItem('quranRadioLang') || 'ar');
-    const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('quranRadioTheme') === 'dark' || localStorage.getItem('quranRadioTheme') === null);
+    // FIX: تغيير القيمة الافتراضية لـ isDarkMode ليكون الثيم الفاتح هو الافتراضي
+    const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('quranRadioTheme') === 'dark'); 
     const [volume, setVolume] = useState(1); 
     const [isSurahListOpen, setIsSurahListOpen] = useState(false);
     const [autoplayBlocked, setAutoplayBlocked] = useState(false); 
@@ -507,8 +509,9 @@ export default function App() {
         
         return (
             <div 
+                // تم تعديل الحد الأقصى للعرض ليتناسب مع الشاشات
                 className={`
-                    mt-16 mx-auto max-w-4xl p-6 rounded-xl shadow-2xl transition-all duration-700 
+                    mt-16 mx-auto max-w-xl p-4 sm:p-6 rounded-xl shadow-2xl transition-all duration-700 
                     ${isPlaying || autoplayBlocked || isPlaylistLoading ? 'opacity-100 scale-100' : 'opacity-70 scale-[0.98]'}
                 `}
                 style={{ 
@@ -519,10 +522,11 @@ export default function App() {
             >
                 <p 
                     id="ayah-text-container" 
-                    className={`text-2xl sm:text-3xl font-bold transition-all duration-300 ${fontClass}`} 
+                    // تصغير حجم الخط قليلاً ليتناسب مع العرض الأوسع
+                    className={`text-base sm:text-lg lg:text-xl font-bold transition-all duration-300 ${fontClass}`} 
                     style={{ 
                         color: currentTheme.accent,
-                        lineHeight: currentLang === 'ar' ? '2.5rem' : '2rem',
+                        lineHeight: currentLang === 'ar' ? '2.0rem' : '1.5rem',
                         textAlign: 'center', 
                         direction: 'rtl', // دائماً النص عربي
                     }}
@@ -532,7 +536,7 @@ export default function App() {
                 </p>
                 {/* مؤشر الآية الحالية */}
                 {isPlaying && currentAyahIndex > 0 && (
-                    <p className="text-sm mt-3 opacity-80" style={{ color: currentTheme.text }}>
+                    <p className="text-xs mt-3 opacity-80" style={{ color: currentTheme.text }}>
                         {getTranslation('ayah_index', { index: currentAyahIndex })}
                     </p>
                 )}
@@ -540,7 +544,7 @@ export default function App() {
         );
     };
     
-    // بطاقة المقرئ
+    // بطاقة المقرئ (محدثة لتصبح عنصر قائمة)
     const ReciterCard = ({ reciter }) => {
         const isSelected = currentReciter.id === reciter.id;
         const name = currentLang === 'ar' ? reciter.name_ar : reciter.name_en;
@@ -548,43 +552,54 @@ export default function App() {
         return (
             <div
                 onClick={() => selectReciter(reciter)}
-                // FIX: تقليل التباعد الداخلي والحجم العام للبطاقة
+                // تم تعديل الأنماط لعرضها كعنصر قائمة واضح
                 className={`
-                    p-1 rounded-md shadow-md transition-all duration-300 transform 
-                    hover:scale-[1.03] hover:shadow-xl flex flex-col items-center cursor-pointer text-center
-                    w-full
+                    p-3 rounded-lg shadow-md transition-all duration-300 transform 
+                    hover:scale-[1.01] hover:shadow-xl flex items-center justify-between cursor-pointer text-${dir === 'rtl' ? 'right' : 'left'}
+                    w-full mb-2
                 `}
                 style={{
                     backgroundColor: isSelected ? currentTheme.accent : currentTheme.card,
                     color: isSelected ? currentTheme.bgStart : currentTheme.text,
-                    boxShadow: isSelected ? `0 0 15px ${currentTheme.shadow}` : undefined,
+                    boxShadow: isSelected ? `0 0 10px ${currentTheme.shadow}` : undefined,
                     border: isSelected ? 'none' : `1px solid ${currentTheme.cardHover}`
                 }}
             >
-                <div 
-                    // FIX: تقليل حجم دائرة الأيقونة بشكل أكبر
-                    className={`
-                        w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center 
-                        text-xl sm:text-2xl font-bold mb-1 transition-all duration-300
-                    `}
-                    style={{
-                        backgroundColor: isSelected ? currentTheme.bgStart : currentTheme.accent,
-                        color: isSelected ? currentTheme.accent : currentTheme.bgStart,
-                        border: `2px solid ${isSelected ? currentTheme.bgStart : currentTheme.accent}`
-                    }}
-                >
-                    {/* FIX: تصغير حجم الأيقونة بشكل أكبر */}
-                    <Mic size={24} /> 
+                <div className="flex items-center">
+                    <div 
+                        // ايقونة المقرئ - تصغير الحجم
+                        className={`
+                            w-10 h-10 rounded-full flex items-center justify-center 
+                            text-base font-bold mr-2 transition-all duration-300
+                        `}
+                        style={{
+                            backgroundColor: isSelected ? currentTheme.bgStart : currentTheme.accent,
+                            color: isSelected ? currentTheme.accent : currentTheme.bgStart,
+                            border: `2px solid ${isSelected ? currentTheme.bgStart : currentTheme.accent}`
+                        }}
+                    >
+                        <Mic size={18} /> 
+                    </div>
+                    <div>
+                        <h3 className="text-base font-bold truncate max-w-full font-['Amiri']">
+                            {name}
+                        </h3>
+                        <p className="text-xs opacity-80 mt-0.5" style={{ color: isSelected ? currentTheme.bgStart : currentTheme.text }}>
+                            {getTranslation('select_surah')}
+                        </p>
+                    </div>
                 </div>
-                {/* FIX: تصغير حجم الخط */}
-                <h3 className="text-xs font-bold mt-1 truncate max-w-full font-['Amiri']">
-                    {name}
-                </h3>
-                <p className="text-[10px] opacity-80 mt-0.5" style={{ color: isSelected ? currentTheme.bgStart : currentTheme.text }}>
-                    {getTranslation('select_surah')}
-                </p>
-                {isPlaylistLoading && isSelected && (
-                    <RotateCw size={12} className="animate-spin mt-0.5" style={{ color: isSelected ? currentTheme.bgStart : currentTheme.accent }} />
+
+                {/* مؤشر التحديد والتحميل */}
+                {(isSelected || isPlaylistLoading) && (
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                        {isPlaylistLoading && isSelected && (
+                            <RotateCw size={16} className="animate-spin" style={{ color: isSelected ? currentTheme.bgStart : currentTheme.accent }} />
+                        )}
+                        {isSelected && (
+                            <Play size={18} style={{ color: isSelected ? currentTheme.bgStart : currentTheme.accent }} />
+                        )}
+                    </div>
                 )}
             </div>
         );
@@ -613,13 +628,18 @@ export default function App() {
 
         return (
             <div className="relative" ref={ref}>
-                <button onClick={() => setIsOpen(!isOpen)} className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${currentTheme.icon}`} aria-label="Language">
-                    <Globe size={24} />
+                <button 
+                    onClick={() => setIsOpen(!isOpen)} 
+                    // تصغير حجم الأيقونة
+                    className={`p-1.5 rounded-full transition-all duration-300 hover:scale-110 ${currentTheme.icon}`} 
+                    aria-label="Language"
+                >
+                    <Globe size={20} />
                 </button>
 
                 {isOpen && (
                     <div
-                        className={`absolute top-12 w-40 rounded-xl shadow-2xl p-2 z-50 transition-all`}
+                        className={`absolute top-10 w-40 rounded-xl shadow-2xl p-2 z-50 transition-all`}
                         style={{ 
                             backgroundColor: currentTheme.card, 
                             border: `1px solid ${currentTheme.accent}`,
@@ -645,21 +665,67 @@ export default function App() {
     // شريط التنقل العلوي
     const Navbar = () => (
         <nav
-            className="fixed top-0 left-0 right-0 z-40 p-4 shadow-xl flex flex-col md:flex-row justify-between items-center transition-all backdrop-blur-md" 
+            // جعل الشريط ثابتاً وكبيراً (p-4 و p-6)
+            className="fixed top-0 left-0 right-0 z-40 p-3 sm:p-4 shadow-xl flex flex-col justify-center transition-all backdrop-blur-md" 
             style={{
                 backgroundColor: currentTheme.card.replace('0.95', '0.85'),
                 borderBottom: `3px solid ${currentTheme.accent}`,
             }}
         >
-            {/* الشعار */}
-            <div className="flex items-center space-x-4 space-x-reverse echo-effect-logo">
-                <h1 className="text-3xl font-extrabold font-['Amiri']" style={{ color: currentTheme.accent }}>
-                    {getTranslation('title')}
-                </h1>
-            </div>
+            {/* المحتوى الداخلي: مركّز ومحدد بـ max-w-6xl */}
+            <div className="flex w-full max-w-6xl items-center justify-between mx-auto">
+                {/* الشعار وأزرار التحكم (على اليسار/اليمين) */}
+                <div className="flex items-center space-x-3 space-x-reverse">
+                    {/* زر القائمة (للهواتف) */}
+                    <button onClick={() => setIsSurahListOpen(true)} className={`p-1.5 rounded-full hover:opacity-80 transition md:hidden ${currentTheme.icon}`} aria-label="Surah List">
+                        <List size={20} />
+                    </button>
+                    {/* الشعار */}
+                    <h1 className="text-xl sm:text-3xl font-extrabold font-['Amiri'] echo-effect-logo" style={{ color: currentTheme.accent }}>
+                        {getTranslation('title')}
+                    </h1>
+                </div>
 
-            {/* حقل البحث */}
-            <div className="relative w-full md:w-1/3 mx-0 md:mx-6 my-2 md:my-0">
+                {/* حقل البحث (يظهر في الوسط على الشاشات الكبيرة) */}
+                <div className="relative flex-grow mx-4 max-w-md hidden md:block">
+                    <input
+                        type="text"
+                        placeholder={getTranslation('search_placeholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full p-2 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                        style={{
+                            backgroundColor: currentTheme.bgStart,
+                            color: currentTheme.text,
+                            borderColor: currentTheme.accent,
+                            outlineColor: currentTheme.accent,
+                            paddingLeft: dir === 'rtl' ? '1rem' : '2.5rem',
+                            paddingRight: dir === 'rtl' ? '2.5rem' : '1rem',
+                        }}
+                    />
+                    <Search className={`absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 ${currentTheme.icon}`} size={18} />
+                </div>
+
+
+                {/* أزرار الإعدادات (على اليمين/اليسار) */}
+                <div className="flex items-center space-x-3 space-x-reverse">
+                    <button onClick={() => {
+                        const newTheme = !isDarkMode;
+                        setIsDarkMode(newTheme);
+                        localStorage.setItem('quranRadioTheme', newTheme ? 'dark' : 'light');
+                    }} className={`p-1.5 rounded-full transition-all duration-300 hover:scale-110 ${currentTheme.icon}`} aria-label="Toggle Theme">
+                        {currentTheme.darkToggle ? <Sun size={20} /> : <Moon size={20} />}
+                    </button>
+                    <LanguageToggle />
+                    {/* زر القائمة (للشاشات الكبيرة) */}
+                    <button onClick={() => setIsSurahListOpen(true)} className={`p-1.5 rounded-full hover:opacity-80 transition hidden md:block ${currentTheme.icon}`} aria-label="Surah List">
+                        <List size={20} />
+                    </button>
+                </div>
+            </div>
+            
+             {/* حقل البحث (يظهر في الأسفل على الهواتف - جزء من الـ Navbar) */}
+            <div className="relative w-full mx-0 md:hidden mt-2">
                 <input
                     type="text"
                     placeholder={getTranslation('search_placeholder')}
@@ -675,80 +741,43 @@ export default function App() {
                         paddingRight: dir === 'rtl' ? '2.5rem' : '1rem',
                     }}
                 />
-                <Search className={`absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 ${currentTheme.icon}`} size={20} />
-            </div>
-
-            {/* أزرار الإعدادات */}
-            <div className="flex items-center space-x-4 space-x-reverse">
-                <button onClick={() => {
-                    const newTheme = !isDarkMode;
-                    setIsDarkMode(newTheme);
-                    localStorage.setItem('quranRadioTheme', newTheme ? 'dark' : 'light');
-                }} className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${currentTheme.icon}`} aria-label="Toggle Theme">
-                    {currentTheme.darkToggle ? <Sun size={24} /> : <Moon size={24} />}
-                </button>
-                <LanguageToggle />
-                <button onClick={() => setIsSurahListOpen(true)} className={`p-2 rounded-full hover:opacity-80 transition ${currentTheme.icon}`} aria-label="Surah List">
-                    <List size={24} />
-                </button>
+                <Search className={`absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 ${currentTheme.icon}`} size={18} />
             </div>
         </nav>
     );
-
-    // شريط مشغل الصوت السفلي
-    const PlayerBar = () => {
-        // ارتفاع شريط التحكم السفلي هو 72px (p-4 + العناصر الداخلية)
-        // يتم استخدام هذا الثابت في حساب ارتفاع القائمة الجانبية
-        // تم التقدير بأن ارتفاع الـ Navbar حوالي 72px
-        // ارتفاع الـ PlayerBar حوالي 80px (p-4)
-        const reciterName = currentLang === 'ar' ? currentReciter.name_ar : currentReciter.name_en;
-        const surahName = currentSurah ? (currentLang === 'ar' ? currentSurah.name : currentSurah.englishName) : '';
-        
-        const nowPlayingText = currentSurah?.name 
-            ? getTranslation('playing', { surahName, reciterName })
-            : getTranslation('not_playing');
-        
+    
+    // شريط التحكم المتحرك (يظهر تحت الشيوخ مباشرةً)
+    const ControlsBar = () => {
         const VolumeIcon = volume === 0 ? VolumeX : Volume2;
 
         return (
             <div
-                id="player-bar"
-                className="fixed bottom-0 left-0 right-0 z-40 shadow-2xl p-4 flex flex-col md:flex-row justify-between items-center transition-all backdrop-blur-md"
+                // تم تصغير العرض الأقصى لتركيز المحتوى
+                className={`w-full max-w-xl mx-auto p-3 rounded-lg shadow-xl mb-6 flex flex-col sm:flex-row items-center justify-center transition-all`}
                 style={{
-                    backgroundColor: currentTheme.card.replace('0.95', '0.85'), 
-                    borderTop: `3px solid ${currentTheme.accent}`,
+                    backgroundColor: currentTheme.card, 
+                    border: `1px solid ${currentTheme.cardHover}`,
                 }}
             >
-                {/* أزرار التحكم */}
-                <div className="flex items-center space-x-4 space-x-reverse w-full md:w-auto mb-3 md:mb-0 justify-center md:justify-start">
+                {/* أزرار التشغيل */}
+                <div className="flex items-center space-x-4 space-x-reverse mb-3 sm:mb-0 mr-0 sm:mr-6">
                     <button
                         onClick={togglePlayPause}
                         disabled={!currentSurah || isPlaylistLoading}
-                        className={`w-12 h-12 rounded-full text-2xl transition-all ${currentSurah ? 'hover:scale-105' : 'opacity-50 cursor-not-allowed'} ${isPlaylistLoading ? 'opacity-50' : ''}`}
+                        // تصغير حجم زر التشغيل
+                        className={`w-10 h-10 rounded-full text-xl transition-all ${currentSurah ? 'hover:scale-105' : 'opacity-50 cursor-not-allowed'} ${isPlaylistLoading ? 'opacity-50' : ''}`}
                         style={{ backgroundColor: currentTheme.accent, color: currentTheme.bgStart }}
                     >
-                        {isPlaying ? <Pause size={24} className="mx-auto" /> : <Play size={24} className="mx-auto" />}
+                        {isPlaying ? <Pause size={20} className="mx-auto" /> : <Play size={20} className="mx-auto" />}
                     </button>
-                    {isPlaylistLoading ? (
-                        <RotateCw size={20} className={`animate-spin ${currentTheme.icon}`} />
-                    ) : (
-                        <Mic size={20} className={isPlaying ? 'animate-pulse' : ''} style={{ color: currentTheme.accent }} />
+                    {isPlaylistLoading && (
+                        <RotateCw size={16} className={`animate-spin ${currentTheme.icon}`} style={{ color: currentTheme.accent }} />
                     )}
                 </div>
 
-                {/* معلومات السورة */}
-                <div className="flex-grow mx-0 md:mx-6 w-full">
-                    <p className="text-lg font-semibold truncate text-center md:text-right mb-1" style={{ color: currentTheme.accent, textAlign: dir === 'rtl' ? 'right' : 'left' }}>
-                        {nowPlayingText}
-                    </p>
-                    <p className="text-sm opacity-80 text-center md:text-right" style={{ color: currentTheme.text, textAlign: dir === 'rtl' ? 'right' : 'left' }}>
-                        {currentSurah ? getTranslation('current_ayah') : getTranslation('select_surah')}
-                    </p>
-                </div>
-
                 {/* التحكم في الصوت */}
-                <div className="flex items-center space-x-3 space-x-reverse w-full md:w-auto mt-3 md:mt-0 justify-center md:justify-end">
-                    <VolumeIcon size={24} className={currentTheme.icon} />
+                <div className="flex items-center space-x-2 space-x-reverse w-full sm:w-auto justify-center">
+                    <VolumeIcon size={20} className={currentTheme.icon} />
                     <input
                         type="range"
                         min="0"
@@ -756,12 +785,62 @@ export default function App() {
                         step="0.01"
                         value={volume}
                         onChange={handleVolumeChange}
-                        className="w-24 h-2 rounded-lg appearance-none cursor-pointer"
+                        className="w-32 h-2 rounded-lg appearance-none cursor-pointer"
                         style={{
                             background: `linear-gradient(to ${dir === 'rtl' ? 'left' : 'right'}, ${currentTheme.accent} ${volume * 100}%, ${currentTheme.cardHover} ${volume * 100}%)`
                         }}
                     />
                 </div>
+            </div>
+        );
+    };
+
+    // شريط مشغل الصوت السفلي (ثابت)
+    const FixedPlayerBar = () => {
+        // ارتفاع شريط التحكم السفلي هو 72px (p-4 + العناصر الداخلية)
+        const reciterName = currentLang === 'ar' ? currentReciter.name_ar : currentReciter.name_en;
+        const surahName = currentSurah ? (currentLang === 'ar' ? currentSurah.name : currentSurah.englishName) : '';
+        
+        const nowPlayingText = currentSurah?.name 
+            ? getTranslation('playing', { surahName, reciterName })
+            : getTranslation('not_playing');
+        
+        const MicIcon = isPlaying ? <Mic size={18} className='animate-pulse' style={{ color: currentTheme.accent }} /> : <Mic size={18} className={currentTheme.icon} />;
+
+
+        return (
+            <div
+                id="fixed-player-bar"
+                // تصغير الـ padding
+                className="fixed bottom-0 left-0 right-0 z-40 shadow-2xl p-3 flex justify-center items-center transition-all backdrop-blur-md"
+                style={{
+                    backgroundColor: currentTheme.card.replace('0.95', '0.85'), 
+                    borderTop: `3px solid ${currentTheme.accent}`,
+                }}
+            >
+                {/* المحتوى الداخلي: مركّز ومحدد بـ max-w-6xl */}
+                <div className="flex w-full max-w-6xl items-center justify-between">
+                    {/* أيقونة حالة التشغيل (Mic) */}
+                    <div className="hidden sm:block">
+                        {MicIcon}
+                    </div>
+
+                    {/* معلومات السورة (النص) - تصغير الخط */}
+                    <div className="flex-grow mx-0 sm:mx-6 w-full text-center sm:text-right">
+                        <p className="text-sm font-semibold truncate mb-0.5" style={{ color: currentTheme.accent, textAlign: dir === 'rtl' ? 'right' : 'left' }}>
+                            {nowPlayingText}
+                        </p>
+                        <p className="text-xs opacity-80" style={{ color: currentTheme.text, textAlign: dir === 'rtl' ? 'right' : 'left' }}>
+                            {currentSurah ? getTranslation('current_ayah') : getTranslation('select_surah')}
+                        </p>
+                    </div>
+                    
+                    {/* رسالة للتنبيه في الهواتف */}
+                    <div className="sm:hidden text-center">
+                        {MicIcon}
+                    </div>
+                </div>
+
             </div>
         );
     };
@@ -779,18 +858,19 @@ export default function App() {
             <div 
                 className={`
                     fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                    bg-red-800/90 p-6 rounded-xl shadow-2xl z-[60] text-center max-w-sm transition-opacity duration-500
+                    bg-red-800/90 p-5 rounded-lg shadow-2xl z-[60] text-center max-w-xs transition-opacity duration-500
                     ${autoplayBlocked ? 'opacity-100 visible' : 'opacity-0 invisible'}
                 `}
                 style={{ 
-                    borderColor: '#AA8453',
+                    borderColor: currentTheme.accent,
                     borderWidth: '2px',
-                    color: '#F9F3E8',
+                    color: currentTheme.text,
+                    backgroundColor: currentTheme.card,
                     fontFamily: currentLang === 'ar' ? "'Amiri', sans-serif" : "'Inter', sans-serif"
                 }}
             >
-                <AlertTriangle size={32} className="mx-auto mb-3" style={{ color: '#F9F3E8' }}/>
-                <p className="font-bold text-lg mb-2">{mainMessage}.</p>
+                <AlertTriangle size={28} className="mx-auto mb-2" style={{ color: currentTheme.accent }}/>
+                <p className="font-bold text-base mb-1">{mainMessage}.</p>
                 <p className="text-sm opacity-90">
                     {subMessage}
                 </p>
@@ -823,6 +903,10 @@ export default function App() {
             }
         };
 
+        // ارتفاع الـ Navbar
+        const navbarHeight = 55; // p-3 + border + line-height (تقريبي)
+        // ارتفاع الـ PlayerBar
+        const playerBarHeight = 50; // p-3 + border + line-height (تقريبي)
 
         return (
             <>
@@ -835,30 +919,29 @@ export default function App() {
                 )}
 
                 <div
-                    // FIX: ضبط الارتفاع ليتناسب بين الـ Navbar والـ PlayerBar
-                    // تم تقدير ارتفاع الـ Navbar بحوالي 72px والـ PlayerBar بحوالي 80px (ملاحظة: هذا التقدير تقريبي ويعتمد على الـ p-4 والعناصر الداخلية)
-                    className={`fixed top-0 z-50 w-full sm:w-80 max-w-[90vw] shadow-2xl transition-transform duration-300 transform pt-20 pb-4
+                    // FIX: ضبط الارتفاع ليتناسب مع الأشرطة الثابتة الجديدة
+                    className={`fixed top-0 z-50 w-full sm:w-72 max-w-[90vw] shadow-2xl transition-transform duration-300 transform pt-20 pb-4
                         ${dir === 'rtl' ? 'right-0' : 'left-0'} 
                         ${isSurahListOpen ? 'translate-x-0' : (dir === 'rtl' ? 'translate-x-full' : '-translate-x-full')}
                     `} 
                     style={{ 
                         backgroundColor: currentTheme.card, 
                         border: `3px solid ${currentTheme.accent}`,
-                        // FIX: حساب الارتفاع لضمان عدم تجاوز القائمة شريط التشغيل السفلي
-                        height: 'calc(100vh - 80px)', 
-                        top: '72px', // ارتفاع تقريبي للـ Navbar
+                        // حساب الارتفاع: ارتفاع الشاشة - ارتفاع شريط التنقل - ارتفاع شريط المشغل
+                        height: `calc(100vh - ${navbarHeight + playerBarHeight}px)`, 
+                        top: `${navbarHeight}px`, 
                     }}
                 >
-                    <div className="p-4 flex flex-col h-full">
-                        <div className="flex justify-between items-center pb-3 mb-4" style={{ borderBottom: `2px solid ${currentTheme.cardHover}` }}>
-                            <h2 className="text-xl font-bold" style={{ color: currentTheme.accent }}>{getTranslation('list_surahs')}</h2>
+                    <div className="p-3 flex flex-col h-full">
+                        <div className="flex justify-between items-center pb-2 mb-3" style={{ borderBottom: `1px solid ${currentTheme.cardHover}` }}>
+                            <h2 className="text-lg font-bold" style={{ color: currentTheme.accent }}>{getTranslation('list_surahs')}</h2>
                             <button onClick={() => setIsSurahListOpen(false)} className={`p-1 rounded-full hover:opacity-80 transition ${currentTheme.icon}`} aria-label="Close List">
-                                <List size={24} />
+                                <List size={18} />
                             </button>
                         </div>
 
                         {/* شريط البحث داخل القائمة */}
-                        <div className="relative mb-4">
+                        <div className="relative mb-3">
                             <input
                                 type="text"
                                 placeholder={getTranslation('search_placeholder').replace('ابحث', 'السورة')}
@@ -874,15 +957,15 @@ export default function App() {
                                     paddingRight: dir === 'rtl' ? '2.5rem' : '1rem',
                                 }}
                             />
-                            <Search className={`absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 ${currentTheme.icon}`} size={20} />
+                            <Search className={`absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 ${currentTheme.icon}`} size={16} />
                         </div>
 
                         {/* FIX: إزالة الـ padding العمودي من هنا والاعتماد على الـ h-full */}
-                        <ul className="space-y-2 overflow-y-auto flex-grow pr-2"> 
+                        <ul className="space-y-1 overflow-y-auto flex-grow pr-1"> 
                             {/* عرض رسالة إذا لم يتم تحميل السور بعد وفتح القائمة */}
                             {loading && surahs.length === 0 && (
-                                <li className="text-center p-4 text-sm" style={{ color: currentTheme.text }}>
-                                    <RotateCw size={20} className={`animate-spin mx-auto ${currentTheme.icon}`} />
+                                <li className="text-center p-3 text-xs" style={{ color: currentTheme.text }}>
+                                    <RotateCw size={18} className={`animate-spin mx-auto ${currentTheme.icon}`} />
                                     {getTranslation('loading')}
                                 </li>
                             )}
@@ -893,7 +976,7 @@ export default function App() {
                                     <li
                                         key={surah.number}
                                         onClick={() => playSurah(surah)}
-                                        className={`p-3 rounded-lg flex justify-between items-center cursor-pointer transition-all duration-200`}
+                                        className={`p-2 rounded-lg flex justify-between items-center cursor-pointer transition-all duration-200 text-sm`}
                                         style={{
                                             backgroundColor: isSelected ? currentTheme.accent : currentTheme.cardHover,
                                             color: isSelected ? currentTheme.bgStart : currentTheme.text,
@@ -908,7 +991,7 @@ export default function App() {
                                 );
                             })}
                             {filteredSurahs.length === 0 && !loading && (
-                                <li className="text-center p-4 text-sm" style={{ color: currentTheme.text }}>
+                                <li className="text-center p-3 text-sm" style={{ color: currentTheme.text }}>
                                     {getTranslation('search_placeholder').replace('ابحث', 'لا توجد نتائج بحث مطابقة')}
                                 </li>
                             )}
@@ -924,7 +1007,7 @@ export default function App() {
     // =================================================================
     
     // تصفية المقرئين للبحث (لمعالجة البحث في الواجهة الرئيسية)
-    const filteredReciters = reciters.filter(reciter => {
+    let filteredReciters = reciters.filter(reciter => {
         const normalizedTerm = searchTerm.trim().toLowerCase();
         if (!normalizedTerm) return true;
 
@@ -932,6 +1015,13 @@ export default function App() {
         return reciter.name_ar.toLowerCase().includes(normalizedTerm) ||
                reciter.name_en.toLowerCase().includes(normalizedTerm);
     });
+    
+    // الترتيب الأبجدي للمقرئين بناءً على الاسم العربي (لتحقيق طلب الترتيب)
+    filteredReciters = filteredReciters.sort((a, b) => {
+        // استخدام localeCompare مع 'ar' لترتيب أبجدي سليم للغة العربية
+        return a.name_ar.localeCompare(b.name_ar, 'ar', { sensitivity: 'base' });
+    });
+
 
     return (
         <div
@@ -959,9 +1049,9 @@ export default function App() {
                     min-height: 100vh; 
                     width: 100vw;
                     box-sizing: border-box;
-                    overflow-x: hidden; /* منع التمرير الأفقي تمامًا */
+                    overflow-x: hidden; /* **تأكيد منع التمرير الأفقي** */
                 }
-
+                
                 @keyframes subtleMove {
                     0% { background-position: 0% 50%; }
                     50% { background-position: 100% 50%; }
@@ -1024,7 +1114,7 @@ export default function App() {
             {/* مشغل الصوت الفعلي - مخفي */}
             <audio ref={audioRef} preload="auto" />
 
-            {/* Navbar */}
+            {/* Navbar - ثابت في الأعلى (يحتوي على الأيقونات والشعار والبحث) */}
             <Navbar />
 
             {/* رسالة حظر التشغيل العائمة */}
@@ -1034,27 +1124,30 @@ export default function App() {
             <AyahDisplay />
 
             {/* Main Content */}
-            {/* FIX: زيادة الـ padding لمنع التداخل مع الـ Fixed Navbar والـ PlayerBar */}
-            <main className="w-full max-w-6xl mx-auto p-4 pt-36 pb-36 relative z-10"> 
-                {/* لوغو صدى الآيات الفني - يجب وضعه ببروز */}
-                <div className="w-48 h-10 mx-auto mb-10 flex items-center justify-center echo-effect-logo">
-                    <h2 className="text-4xl font-extrabold font-['Amiri']" style={{ color: currentTheme.accent }}>
-                        {getTranslation('title')}
-                    </h2>
+            {/* تم إزالة max-w-6xl من main ليتمدد المحتوى أفقياً (لكن المحتويات الداخلية ستكون بـ max-w-6xl) */}
+            {/* تقليص الهوامش العلوية والسفلية قليلاً لتناسب الأشرطة الصغيرة الجديدة */}
+            <main className="w-full mx-auto p-3 relative z-10 pt-[80px] pb-[70px] min-h-screen"> 
+
+                {/* تصغير حجم الخط */}
+                <h2 className="text-xl sm:text-2xl font-bold mb-5 text-center font-['Amiri']" style={{ color: currentTheme.accent }}>
+                    {getTranslation('reciters_title')}
+                </h2>
+                
+                {/* الشريط المتحرك: شريط التحكم في التشغيل والصوت (تحت الشيوخ مباشرة) */}
+                {/* تم توسيع الشريط ليتناسب مع العرض الأكبر */}
+                <div className="max-w-xl mx-auto mb-6">
+                    <ControlsBar />
                 </div>
 
 
-                <h2 className="text-3xl font-bold mb-8 text-center font-['Amiri']" style={{ color: currentTheme.accent }}>
-                    {getTranslation('reciters_title')}
-                </h2>
-
-                {/* عرض المقرئين */}
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-4">
+                {/* عرض المقرئين - قائمة مرتبة وأيقونات واضحة */}
+                {/* تم تضييق العرض الأقصى لتركيز المحتوى */}
+                <div className="flex flex-col space-y-2 max-w-xl mx-auto">
                     {filteredReciters.map(reciter => (
                         <ReciterCard key={reciter.id} reciter={reciter} />
                     ))}
                     {filteredReciters.length === 0 && (
-                        <p className="col-span-full text-center text-xl mt-10" style={{ color: currentTheme.text }}>
+                        <p className="col-span-full text-center text-base mt-8" style={{ color: currentTheme.text }}>
                             {getTranslation('search_placeholder').replace('ابحث', 'لا توجد نتائج بحث مطابقة لـ')} "{searchTerm}"
                         </p>
                     )}
@@ -1062,24 +1155,24 @@ export default function App() {
                 
                 {/* رسالة التحميل أو الخطأ الأولي */}
                 {(loading && surahs.length === 0) && (
-                    <div className="text-center mt-10 p-4 col-span-full">
-                        <p className="text-center text-xl flex items-center justify-center" style={{ color: currentTheme.text }}>
-                            <RotateCw size={20} className={`animate-spin mr-2 ${currentTheme.icon}`} />
+                    <div className="text-center mt-8 p-3 col-span-full">
+                        <p className="text-center text-base flex items-center justify-center" style={{ color: currentTheme.text }}>
+                            <RotateCw size={18} className={`animate-spin mr-2 ${currentTheme.icon}`} />
                             {getTranslation('loading')}
                         </p>
                     </div>
                 )}
                 {initialError && (
-                    <div className="text-center mt-10 p-4 col-span-full">
-                        <div className="text-center p-6 rounded-xl bg-red-800/20 text-yellow-500 shadow-2xl" style={{ borderColor: currentTheme.accent, border: '2px solid' }}>
-                            <AlertTriangle size={32} className="mx-auto mb-3" style={{ color: currentTheme.accent }}/>
-                            <h2 className="text-2xl font-bold mb-2" style={{ color: currentTheme.accent }}>
+                    <div className="text-center mt-8 p-3 col-span-full">
+                        <div className="text-center p-5 rounded-lg bg-red-800/20 text-yellow-500 shadow-xl" style={{ borderColor: currentTheme.accent, border: '1px solid' }}>
+                            <AlertTriangle size={28} className="mx-auto mb-2" style={{ color: currentTheme.accent }}/>
+                            <h2 className="text-xl font-bold mb-1" style={{ color: currentTheme.accent }}>
                                 {getTranslation('error')}
                             </h2>
-                            <p className="text-lg" style={{ color: currentTheme.text }}>
+                            <p className="text-base" style={{ color: currentTheme.text }}>
                                 {getTranslation('network_error')}
                             </p>
-                            <p className="text-sm opacity-70 mt-2" style={{ color: currentTheme.text }}>
+                            <p className="text-sm opacity-70 mt-1" style={{ color: currentTheme.text }}>
                                 لا يمكن عرض قائمة السور الآن. يمكنك اختيار المقرئ والمحاولة لاحقاً.
                             </p>
                         </div>
@@ -1087,18 +1180,23 @@ export default function App() {
                 )}
             </main>
 
-            {/* Player Bar */}
-            <PlayerBar />
+            {/* FixedPlayerBar - ثابت في الأسفل (يعرض فقط حالة التشغيل الحالية) */}
+            <FixedPlayerBar />
 
-            {/* Surah List Sidebar */}
+            {/* Surah List Sidebar - تم إصلاح ارتفاعه ليناسب الأشرطة الثابتة */}
             <SurahListSidebar />
 
             {/* Footer - في آخر البيدج تماماً (يظهر بعد السكرول) */}
-            <footer className="w-full mx-auto p-4 py-8 text-center relative z-10" style={{ backgroundColor: currentTheme.bgEnd }}>
+            <footer 
+                // تم إزالة max-w-6xl ليتمدد الشريط بالكامل
+                className="w-full mx-auto p-3 py-6 text-center relative z-10" 
+                style={{ backgroundColor: currentTheme.bgEnd }}
+            >
+                {/* تم تطبيق max-w-6xl على المحتوى الداخلي للـ Footer لمركزه */}
                 <div className="flex justify-between max-w-6xl mx-auto flex-col md:flex-row items-center">
                     {/* الجملة المميزة مكبرة الآن */}
                     <p 
-                        className="footer-special-text extra-large-footer-text" 
+                        className="footer-special-text extra-large-footer-text text-sm" 
                         style={{ color: currentTheme.accent, order: dir === 'rtl' ? -1 : 1 }}
                     >
                         {getTranslation('from_to_world')}
@@ -1110,7 +1208,7 @@ export default function App() {
                             {getTranslation('development_note')}
                         </p>
                         {/* اسم المصمم المميز */}
-                        <p className="footer-special-text" style={{ color: currentTheme.accent }}>
+                        <p className="footer-special-text text-xs" style={{ color: currentTheme.accent }}>
                             Designed by Sera
                         </p>
                     </div>
