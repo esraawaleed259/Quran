@@ -1,0 +1,26 @@
+/* هذا الملف هو ملف الأنماط العامة القياسي (Global Styles)
+لمشروع React + Vite، والذي يحتاجه App.jsx لكي يعمل. 
+*/
+
+/* استيراد أنماط Tailwind الأساسية والضرورية */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* إذا كنت تريد أي أنماط CSS إضافية لا يمكن تطبيقها عبر 
+Tailwind مباشرة، يمكنك إضافتها هنا. 
+*/
+
+/* تطبيق نمط إعادة الضبط (Reset) على كامل الصفحة 
+لضمان سلوك موحد عبر المتصفحات. 
+*/
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+#root {
+    /* يجعل عنصر الجذر يملأ الشاشة لتطبيق الخلفية على كامل العرض */
+    width: 100%;
+    min-height: 100vh;
+}
